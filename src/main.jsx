@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import FileManager from "./CustomFileManager.js";
+import FileManager from "./FileManager.js";
 
 import "./index.css";
 

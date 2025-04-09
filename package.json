@@ -10,14 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@syncfusion/ej2-base": "^29.1.36",
-    "@syncfusion/ej2-react-filemanager": "^29.1.37",
-    "font-awesome": "^4.7.0",
-    "lodash.flow": "^3.5.0",
     "lucide-react": "^0.487.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-keyed-file-browser": "^1.14.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
