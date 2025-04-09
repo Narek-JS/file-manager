@@ -92,6 +92,30 @@ const FileManager: React.FC = () => {
         );
 
         setItems([...folders, ...files]);
+
+        // Ensure all levels in the path are expanded
+        const expanded: Record<string, boolean> = {};
+        selectedPath.forEach((_, index) => {
+          const key = selectedPath.slice(0, index + 1).join("/");
+          expanded[key] = true;
+        });
+        setExpandedPaths((prev) => ({ ...prev, ...expanded }));
+
+        // Fetch all levels of path
+        for (let i = 0; i < selectedPath.length; i++) {
+          const subPath = selectedPath.slice(0, i + 1).join("/");
+          if (!fetchedChildren[subPath]) {
+            const res = await fetch(
+              `https://api.fasttv.dev.yospace.ai/api/s3/folders?folder=${subPath}`,
+              { headers: { "s3-api-key": S3_API_KEY } }
+            );
+            const subData = await res.json();
+            setFetchedChildren((prev) => ({
+              ...prev,
+              [subPath]: subData.data,
+            }));
+          }
+        }
       } catch {
         setItems([]);
       }
