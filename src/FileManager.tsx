@@ -329,8 +329,8 @@ const FileManager: React.FC = () => {
       <div className="relative max-w-7xl mx-auto border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg bg-white dark:bg-gray-900 p-6">
         <div className="flex gap-6 m">
           {/* Sidebar */}
-          <div className="w-64 border-r border-gray-200 dark:border-gray-700 pr-4 overflow-auto max-h-[445px]">
-            <div className="mb-4 mt-1 ml-1 flex gap-2">
+          <div className="w-64 border-r border-gray-200 dark:border-gray-700 pr-4 overflow-auto">
+            <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 pt-1 pb-2 px-1 border-b border-gray-200 dark:border-gray-700">
               <Button
                 variant="ghost"
                 size="sm"
@@ -348,7 +348,9 @@ const FileManager: React.FC = () => {
                 <Upload className="w-4 h-4 mr-1" /> Upload
               </Button>
             </div>
-            {renderTree([])}
+            <div className="overflow-auto max-h-[399px] px-1">
+              {renderTree([])}
+            </div>
           </div>
 
           {/* Main Content */}
