@@ -330,7 +330,7 @@ const FileManager: React.FC = () => {
         <div className="flex gap-6 m">
           {/* Sidebar */}
           <div className="w-64 border-r border-gray-200 dark:border-gray-700 pr-4 overflow-auto">
-            <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 pt-1 pb-2 px-1 border-b border-gray-200 dark:border-gray-700">
+            <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 flex gap-2 pt-1 pb-2 px-1 border-b border-gray-200 dark:border-gray-700">
               <Button
                 variant="ghost"
                 size="sm"
@@ -451,7 +451,7 @@ const FileManager: React.FC = () => {
         </div>
 
         {isLoading && (
-          <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+          <div className="w-full h-full absolute top-0 left-0 z-20 flex items-center justify-center">
             <div className="w-full h-full bg-gray-200 opacity-50" />
             <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <LoaderCircle className="animate-spin" />
