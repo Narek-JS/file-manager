@@ -1,13 +1,14 @@
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
-import { CardContent, Button, Input } from "./components/ui";
 import { getFolders, uploadFiles } from "./utils/requestHandlers";
+import { CardContent, Button, Input } from "./components/ui";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { RefreshCw, FileText, Folder } from "lucide-react";
 import { ScreenLoading } from "./components/ScreenLoading";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
-import { useState, useEffect, useMemo } from "react";
 import { FixedSizeList as List } from "react-window";
 import { Sidebar } from "./components/Sidebar";
+import { IMAGE_URL } from "./constants";
 import classNames from "classnames";
 import React from "react";
 
@@ -31,11 +32,14 @@ const FileManager: React.FC = () => {
   const [expandedPaths, setExpandedPaths] = useState<ExpandedPathsT>({});
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [selectedPath, setSelectedPath] = useState<string[]>([]);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [showUploadFile, setShowUploadFile] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState<string>("");
   const [items, setItems] = useState<Item[]>([]);
+
+  const timeoutId = useRef<ReturnType<typeof setTimeout>>(null);
 
   useEffect(() => {
     const loadRoot = async () => {
@@ -243,10 +247,27 @@ const FileManager: React.FC = () => {
                         {rowItems.map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
-                            onClick={() => {
+                            className="relative flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+
                               if (item.type === "folder") {
                                 setSelectedPath((prev) => [...prev, item.name]);
+                              } else {
+                                const path =
+                                  IMAGE_URL +
+                                  (selectedPath.length
+                                    ? selectedPath.join("/") + "/" + item.name
+                                    : item.name);
+
+                                if (timeoutId.current) {
+                                  clearTimeout(timeoutId.current);
+                                }
+
+                                navigator.clipboard.writeText(path).then(() => {
+                                  setCopiedId(item.id);
+                                  setTimeout(() => setCopiedId(null), 1500);
+                                });
                               }
                             }}
                           >
@@ -255,9 +276,21 @@ const FileManager: React.FC = () => {
                             ) : (
                               <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
                             )}
-                            <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                            <div className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
                               {item.name}
-                            </span>
+                              {copiedId === item.id && (
+                                <p
+                                  className={classNames(
+                                    "absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-1 text-xs rounded bg-black text-white animate-fadeInOut z-50",
+                                    {
+                                      "!top-[10px] !left-10": index < 1,
+                                    }
+                                  )}
+                                >
+                                  Copied
+                                </p>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
