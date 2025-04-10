@@ -1,11 +1,10 @@
-import React from "react";
-
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui";
+import React from "react";
 
 interface Props {
-  setSelectedPath: any;
-  selectedPath: any;
+  setSelectedPath: React.Dispatch<React.SetStateAction<Array<string>>>;
+  selectedPath: Array<string>;
 }
 
 const Breadcrumbs: React.FC<Props> = ({ setSelectedPath, selectedPath }) => {

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { Button } from "../ui";
-import { S3_API_KEY } from "../../constants";
 import { uploadFiles } from "../../utils/requestHandlers";
+import { useState } from "react";
+import { Button } from "../ui";
+import React from "react";
 
 interface Props {
-  setShowUploadFile: any;
-  setSelectedPath: any;
-  currentPathStr: any;
-  selectedPath: any;
+  setShowUploadFile: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedPath: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedPath: Array<string>;
+  currentPathStr: string;
 }
 
 const UploadFile: React.FC<Props> = ({
@@ -32,7 +32,7 @@ const UploadFile: React.FC<Props> = ({
       setShowUploadFile(false);
       setUploadFile(null);
     } catch (err) {
-      console.error("Upload failed", err);
+      console.error("err --> ", err);
     }
   };
 
@@ -47,12 +47,7 @@ const UploadFile: React.FC<Props> = ({
           <input
             type="file"
             onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-            className="block w-full text-base text-gray-700 dark:text-gray-200 h-12 file:mr-4 file:py-2 file:px-4
-            file:rounded-lg file:border-0
-            file:text-base file:font-medium
-            file:bg-blue-100 file:text-blue-700
-            hover:file:bg-blue-200
-            cursor-pointer"
+            className="block w-full text-base text-gray-700 dark:text-gray-200 h-12 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-base file:font-medium file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer"
           />
         </label>
 

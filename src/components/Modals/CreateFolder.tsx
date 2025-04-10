@@ -1,12 +1,13 @@
 import { uploadFiles } from "../../utils/requestHandlers";
-import React, { useState } from "react";
 import { Button, Input } from "../ui";
+import { useState } from "react";
+import React from "react";
 
 interface Props {
-  setShowCreateFolder: any;
-  setSelectedPath: any;
-  currentPathStr: any;
-  selectedPath: any;
+  setShowCreateFolder: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedPath: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedPath: Array<string>;
+  currentPathStr: string;
 }
 
 const CreateFolder: React.FC<Props> = ({
@@ -31,7 +32,7 @@ const CreateFolder: React.FC<Props> = ({
       setShowCreateFolder(false);
       setNewFolderName("");
     } catch (err) {
-      console.error("Error creating folder", err);
+      console.error("err --> ", err);
     }
   };
 

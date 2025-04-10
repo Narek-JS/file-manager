@@ -1,19 +1,20 @@
-import React from "react";
-
 import { ChevronDown, ChevronRight, Folder, Plus, Upload } from "lucide-react";
+import { ExpandedPathsT, FetchedChildT } from "../../FileManager";
 import { getFolders } from "../../utils/requestHandlers";
 import { Button } from "../ui";
+import classNames from "classnames";
+import React from "react";
 
 interface Props {
-  setShowCreateFolder: any;
-  setFetchedChildren: any;
-  setShowUploadFile: any;
-  setExpandedPaths: any;
-  setSelectedPath: any;
-  fetchedChildren: any;
-  expandedPaths: any;
-  selectedPath: any;
-  setIsLoading: any;
+  setFetchedChildren: React.Dispatch<React.SetStateAction<FetchedChildT>>;
+  setExpandedPaths: React.Dispatch<React.SetStateAction<ExpandedPathsT>>;
+  setSelectedPath: React.Dispatch<React.SetStateAction<Array<string>>>;
+  setShowCreateFolder: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowUploadFile: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchedChildren: FetchedChildT;
+  expandedPaths: ExpandedPathsT;
+  selectedPath: Array<string>;
 }
 
 const Sidebar: React.FC<Props> = ({
@@ -61,11 +62,13 @@ const Sidebar: React.FC<Props> = ({
           return (
             <li key={fullKey}>
               <div
-                className={`flex items-center gap-1 cursor-pointer py-1 hover:bg-gray-100 dark:hover:bg-gray-800 px-1 rounded ${
-                  selectedPath.join("/") === fullKey
-                    ? "bg-gray-200 dark:bg-gray-700 text-blue-500 font-medium"
-                    : ""
-                }`}
+                className={classNames(
+                  "flex items-center gap-1 cursor-pointer py-1 hover:bg-gray-100 dark:hover:bg-gray-800 px-1 rounded",
+                  {
+                    "bg-gray-200 dark:bg-gray-700 text-blue-500 font-medium":
+                      selectedPath.join("/") === fullKey,
+                  }
+                )}
                 onClick={() => setSelectedPath(fullPath)}
               >
                 <span

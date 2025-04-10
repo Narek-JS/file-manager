@@ -1,11 +1,11 @@
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
 import { Card, CardContent, Button, Input } from "./components/ui";
+import { getFolders, uploadFiles } from "./utils/requestHandlers";
 import { RefreshCw, FileText, Folder } from "lucide-react";
 import { ScreenLoading } from "./components/ScreenLoading";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
 import { useState, useEffect, useMemo } from "react";
-import { getFolders, uploadFiles } from "./utils/requestHandlers";
 import { Sidebar } from "./components/Sidebar";
 import classNames from "classnames";
 import React from "react";
@@ -16,8 +16,11 @@ interface Item {
   id: number;
 }
 
-type FetchedChildT = Record<string, { folders: string[]; files: string[] }>;
-type ExpandedPathsT = Record<string, boolean>;
+export type FetchedChildT = Record<
+  string,
+  { folders: string[]; files: string[] }
+>;
+export type ExpandedPathsT = Record<string, boolean>;
 
 const FileManager: React.FC = () => {
   const [fetchedChildren, setFetchedChildren] = useState<FetchedChildT>({});
@@ -33,6 +36,7 @@ const FileManager: React.FC = () => {
   useEffect(() => {
     const loadRoot = async () => {
       setIsLoading(true);
+
       try {
         const data = await getFolders();
         setFetchedChildren((prev) => ({ ...prev, [""]: data }));
@@ -57,7 +61,8 @@ const FileManager: React.FC = () => {
 
       try {
         const data = await getFolders(currentPath);
-        const folders: Item[] = (data.folders || []).map(
+
+        const folders = (data?.folders || []).map(
           (name: string, index: number) => ({
             id: index,
             name,
@@ -65,7 +70,7 @@ const FileManager: React.FC = () => {
           })
         );
 
-        const files: Item[] = (data.images || []).map(
+        const files = (data?.images || []).map(
           (fileName: string, index: number) => ({
             id: index + 1000,
             name: fileName,
@@ -83,7 +88,6 @@ const FileManager: React.FC = () => {
         });
         setExpandedPaths((prev) => ({ ...prev, ...expanded }));
 
-        // Fetch all levels of path
         for (let i = 0; i < selectedPath.length; i++) {
           const subPath = selectedPath.slice(0, i + 1).join("/");
           if (!fetchedChildren[subPath]) {
@@ -107,6 +111,7 @@ const FileManager: React.FC = () => {
 
   const handleUpload = async (files: FileList | null) => {
     if (!files) return;
+
     const currentPath = selectedPath.join("/");
     const formData = new FormData();
     formData.append("folder", currentPath);
@@ -121,15 +126,10 @@ const FileManager: React.FC = () => {
       const res = await uploadFiles(formData);
 
       if (res.ok) {
-        // Refresh folder contents after upload
         setSelectedPath([...selectedPath]);
-        const updated = await res.json();
-        console.log("Upload success:", updated);
-      } else {
-        console.error("Upload failed:", await res.text());
       }
     } catch (err) {
-      console.error("Upload error:", err);
+      console.error("err --> ", err);
     }
 
     setIsLoading(false);

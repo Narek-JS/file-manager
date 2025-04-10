@@ -1,5 +1,5 @@
-import React from "react";
 import { LoaderCircle } from "lucide-react";
+import React from "react";
 
 const ScreenLoading: React.FC = () => {
   return (
