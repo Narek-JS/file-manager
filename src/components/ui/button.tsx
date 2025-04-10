@@ -25,7 +25,7 @@ export const Button: React.FC<ButtonProps> = ({
     sm: "px-3 py-1 text-sm",
     default: "px-4 py-2",
     lg: "px-5 py-3 text-base",
-    icon: "p-2 w-9 h-9", // For icon-only buttons
+    icon: "p-2 w-9 h-9",
   };
 
   return (
