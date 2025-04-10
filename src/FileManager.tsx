@@ -8,7 +8,6 @@ import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
 import { FixedSizeList as List } from "react-window";
 import { Sidebar } from "./components/Sidebar";
-import { IMAGE_URL } from "./constants";
 import classNames from "classnames";
 import React from "react";
 
@@ -255,7 +254,7 @@ const FileManager: React.FC = () => {
                                 setSelectedPath((prev) => [...prev, item.name]);
                               } else {
                                 const path =
-                                  IMAGE_URL +
+                                  "images/" +
                                   (selectedPath.length
                                     ? selectedPath.join("/") + "/" + item.name
                                     : item.name);
