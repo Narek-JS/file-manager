@@ -8,14 +8,14 @@ interface Props {
 const EmptyScreen: React.FC<Props> = ({ isOnlyText }) => {
   if (isOnlyText) {
     return (
-      <div className="font-sans text-gray-400 text-[32px] absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
-        Empty
+      <div className="w-full font-sans text-gray-400 text-[32px] min-h-[355px] flex items-center justify-center">
+        <p>Empty</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex items-center justify-center flex-col w-full font-sans text-gray-400">
+    <div className="mx-auto flex items-center justify-center flex-col w-full font-sans text-gray-400 min-h-[355px]">
       <Folder size={70} />
       <p>This Folder is empty</p>
       <p>Drag files here to upload</p>

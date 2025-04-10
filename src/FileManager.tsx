@@ -1,14 +1,18 @@
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
-import { Card, CardContent, Button, Input } from "./components/ui";
+import { CardContent, Button, Input } from "./components/ui";
 import { getFolders, uploadFiles } from "./utils/requestHandlers";
 import { RefreshCw, FileText, Folder } from "lucide-react";
 import { ScreenLoading } from "./components/ScreenLoading";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
 import { useState, useEffect, useMemo } from "react";
+import { FixedSizeList as List } from "react-window";
 import { Sidebar } from "./components/Sidebar";
 import classNames from "classnames";
 import React from "react";
+
+const ROW_HEIGHT = 40;
+const COLUMN_COUNT = 4;
 
 interface Item {
   type: "folder" | "file";
@@ -202,46 +206,68 @@ const FileManager: React.FC = () => {
               </div>
             </div>
 
-            <Card className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <CardContent
-                className={classNames(
-                  "p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 relative",
-                  {
-                    "!flex min-h-[380px] h-full": !searchFilteredItems.length,
-                    "opacity-50 bg-gray-200": dragActive,
-                  }
-                )}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-              >
-                {searchFilteredItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
-                    onClick={() => {
-                      if (item.type === "folder") {
-                        setSelectedPath((prev) => [...prev, item.name]);
-                      }
-                    }}
-                  >
-                    {item.type === "folder" ? (
-                      <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
-                    ) : (
-                      <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
-                    )}
-                    <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
-                      {item.name}
-                    </span>
-                  </div>
-                ))}
+            <CardContent
+              className={classNames(
+                "p-4 relative rounded-xl border border-gray-200 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700",
+                {
+                  "!flex": !searchFilteredItems.length || true,
+                  "opacity-50 bg-gray-200": dragActive,
+                }
+              )}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              {searchFilteredItems.length > 0 ? (
+                <List
+                  height={355}
+                  itemCount={Math.ceil(
+                    searchFilteredItems.length / COLUMN_COUNT
+                  )}
+                  itemSize={ROW_HEIGHT + 16}
+                  width="100%"
+                >
+                  {({ index, style }) => {
+                    const startIndex = index * COLUMN_COUNT;
+                    const rowItems = searchFilteredItems.slice(
+                      startIndex,
+                      startIndex + COLUMN_COUNT
+                    );
 
-                {!searchFilteredItems.length && (
-                  <EmptyScreen isOnlyText={Boolean(search)} />
-                )}
-              </CardContent>
-            </Card>
+                    return (
+                      <div
+                        style={style}
+                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 !pb-[200px]"
+                      >
+                        {rowItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                            onClick={() => {
+                              if (item.type === "folder") {
+                                setSelectedPath((prev) => [...prev, item.name]);
+                              }
+                            }}
+                          >
+                            {item.type === "folder" ? (
+                              <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
+                            ) : (
+                              <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
+                            )}
+                            <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                              {item.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }}
+                </List>
+              ) : (
+                <EmptyScreen isOnlyText={Boolean(search)} />
+              )}
+            </CardContent>
           </div>
         </div>
 
