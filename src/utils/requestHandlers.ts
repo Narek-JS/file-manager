@@ -22,7 +22,7 @@ export const uploadFiles = async (body: FormData) => {
 };
 
 export const deleteFiles = async (body: {
-  files: Array<string>;
+  images: Array<string>;
   folder: string;
 }) => {
   const res = await fetch(DELETE_URL, {

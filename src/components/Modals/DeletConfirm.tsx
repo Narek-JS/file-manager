@@ -20,7 +20,7 @@ const DeleteConfirm: React.FC<Props> = ({
       const currentPath = selectedPath.join("/");
       const res = await deleteFiles({
         folder: currentPath,
-        files: selectedFiles,
+        images: selectedFiles,
       });
 
       if (res.ok) {
