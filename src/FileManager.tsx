@@ -1,8 +1,10 @@
+import { deleteFiles, getFolders, uploadFiles } from "./utils/requestHandlers";
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
-import { getFolders, uploadFiles } from "./utils/requestHandlers";
+import { RefreshCw, FileText, Folder, Trash2 } from "lucide-react";
+import { DeleteConfirm } from "./components/Modals/DeletConfirm";
+import { CopiedTooltip } from "./components/ui/CopiedTooltip";
 import { CardContent, Button, Input } from "./components/ui";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { RefreshCw, FileText, Folder } from "lucide-react";
 import { ScreenLoading } from "./components/ScreenLoading";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
@@ -29,6 +31,8 @@ export type ExpandedPathsT = Record<string, boolean>;
 const FileManager: React.FC = () => {
   const [fetchedChildren, setFetchedChildren] = useState<FetchedChildT>({});
   const [expandedPaths, setExpandedPaths] = useState<ExpandedPathsT>({});
+  const [selectedFiles, setSelectedFiles] = useState<Array<string>>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [selectedPath, setSelectedPath] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -37,6 +41,7 @@ const FileManager: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState<string>("");
   const [items, setItems] = useState<Item[]>([]);
+  const [select, setSelect] = useState(false);
 
   const timeoutId = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -175,8 +180,10 @@ const FileManager: React.FC = () => {
             setFetchedChildren={setFetchedChildren}
             setShowUploadFile={setShowUploadFile}
             setExpandedPaths={setExpandedPaths}
+            setSelectedFiles={setSelectedFiles}
             setSelectedPath={setSelectedPath}
             setIsLoading={setIsLoading}
+            setSelect={setSelect}
             fetchedChildren={fetchedChildren}
             expandedPaths={expandedPaths}
             selectedPath={selectedPath}
@@ -190,6 +197,33 @@ const FileManager: React.FC = () => {
               />
 
               <div className="flex gap-2 items-center">
+                {!!selectedFiles.length && (
+                  <div
+                    className="flex items-center justify-center gap-[1px] cursor-pointer"
+                    onClick={() => {
+                      setShowDeleteConfirm(true);
+                    }}
+                  >
+                    <span className="text-[#ff0000]">
+                      {selectedFiles.length} |
+                    </span>
+                    <Trash2 color="red" />
+                  </div>
+                )}
+                <Button
+                  className=" text-gray-500 dark:text-gray-400 min-w-[60px]"
+                  onClick={() => {
+                    if (select) {
+                      setSelectedFiles([]);
+                    }
+
+                    setSelect((prev) => !prev);
+                  }}
+                  variant={select ? "default" : "ghost"}
+                  size="icon"
+                >
+                  Select
+                </Button>
                 <Button
                   className="hover:bg-transparent text-gray-500 dark:text-gray-400"
                   onClick={() => {
@@ -252,21 +286,43 @@ const FileManager: React.FC = () => {
 
                               if (item.type === "folder") {
                                 setSelectedPath((prev) => [...prev, item.name]);
+                                setSelectedFiles([]);
+                                setSelect(false);
                               } else {
-                                const path =
-                                  "images/" +
-                                  (selectedPath.length
-                                    ? selectedPath.join("/") + "/" + item.name
-                                    : item.name);
+                                if (select) {
+                                  const isSelected = !!selectedFiles.find(
+                                    (fileName) => item.name === fileName
+                                  );
+                                  if (!isSelected) {
+                                    setSelectedFiles([
+                                      ...selectedFiles,
+                                      item.name,
+                                    ]);
+                                  } else {
+                                    setSelectedFiles(
+                                      selectedFiles.filter(
+                                        (fileName) => fileName !== item.name
+                                      )
+                                    );
+                                  }
+                                } else {
+                                  const path =
+                                    "images/" +
+                                    (selectedPath.length
+                                      ? selectedPath.join("/") + "/" + item.name
+                                      : item.name);
 
-                                if (timeoutId.current) {
-                                  clearTimeout(timeoutId.current);
+                                  if (timeoutId.current) {
+                                    clearTimeout(timeoutId.current);
+                                  }
+
+                                  navigator.clipboard
+                                    .writeText(path)
+                                    .then(() => {
+                                      setCopiedId(item.id);
+                                      setTimeout(() => setCopiedId(null), 1500);
+                                    });
                                 }
-
-                                navigator.clipboard.writeText(path).then(() => {
-                                  setCopiedId(item.id);
-                                  setTimeout(() => setCopiedId(null), 1500);
-                                });
                               }
                             }}
                           >
@@ -278,16 +334,19 @@ const FileManager: React.FC = () => {
                             <div className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
                               {item.name}
                               {copiedId === item.id && (
-                                <p
-                                  className={classNames(
-                                    "absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-1 text-xs rounded bg-black text-white animate-fadeInOut z-50",
-                                    {
-                                      "!top-[10px] !left-10": index < 1,
-                                    }
-                                  )}
-                                >
-                                  Copied
-                                </p>
+                                <CopiedTooltip index={index} />
+                              )}
+                              {item.type === "file" && select && (
+                                <Input
+                                  checked={
+                                    !!selectedFiles.find(
+                                      (fileName) => item.name === fileName
+                                    )
+                                  }
+                                  onChange={() => {}}
+                                  type="radio"
+                                  className="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                />
                               )}
                             </div>
                           </div>
@@ -321,6 +380,19 @@ const FileManager: React.FC = () => {
           setSelectedPath={setSelectedPath}
           currentPathStr={currentPathStr}
           selectedPath={selectedPath}
+        />
+      )}
+
+      {showDeleteConfirm && (
+        <DeleteConfirm
+          setSelectedPath={setSelectedPath}
+          selectedFiles={selectedFiles}
+          selectedPath={selectedPath}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setSelectedFiles([]);
+            setSelect(false);
+          }}
         />
       )}
     </div>

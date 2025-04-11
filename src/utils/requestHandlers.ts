@@ -1,4 +1,4 @@
-import { S3_API_KEY, UPLOAD_URL, FOLDERS_URL } from "../constants";
+import { S3_API_KEY, UPLOAD_URL, FOLDERS_URL, DELETE_URL } from "../constants";
 
 export const getFolders = async (path: string = "") => {
   const URL = FOLDERS_URL + (path ? `?folder=${path}` : "");
@@ -16,6 +16,19 @@ export const uploadFiles = async (body: FormData) => {
     headers: { "s3-api-key": S3_API_KEY },
     method: "POST",
     body,
+  });
+
+  return res;
+};
+
+export const deleteFiles = async (body: {
+  files: Array<string>;
+  folder: string;
+}) => {
+  const res = await fetch(DELETE_URL, {
+    headers: { "s3-api-key": S3_API_KEY },
+    method: "POST",
+    body: JSON.stringify(body),
   });
 
   return res;

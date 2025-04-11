@@ -8,10 +8,12 @@ import React from "react";
 interface Props {
   setFetchedChildren: React.Dispatch<React.SetStateAction<FetchedChildT>>;
   setExpandedPaths: React.Dispatch<React.SetStateAction<ExpandedPathsT>>;
+  setSelectedFiles: React.Dispatch<React.SetStateAction<Array<string>>>;
   setSelectedPath: React.Dispatch<React.SetStateAction<Array<string>>>;
   setShowCreateFolder: React.Dispatch<React.SetStateAction<boolean>>;
   setShowUploadFile: React.Dispatch<React.SetStateAction<boolean>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelect: React.Dispatch<React.SetStateAction<boolean>>;
   fetchedChildren: FetchedChildT;
   expandedPaths: ExpandedPathsT;
   selectedPath: Array<string>;
@@ -22,11 +24,13 @@ const Sidebar: React.FC<Props> = ({
   setFetchedChildren,
   setShowUploadFile,
   setExpandedPaths,
+  setSelectedFiles,
   setSelectedPath,
   fetchedChildren,
   expandedPaths,
   selectedPath,
   setIsLoading,
+  setSelect,
 }) => {
   const toggleExpand = async (path: string) => {
     setExpandedPaths((prev) => ({ ...prev, [path]: !prev[path] }));
@@ -69,7 +73,11 @@ const Sidebar: React.FC<Props> = ({
                       selectedPath.join("/") === fullKey,
                   }
                 )}
-                onClick={() => setSelectedPath(fullPath)}
+                onClick={() => {
+                  setSelectedFiles([]);
+                  setSelect(false);
+                  setSelectedPath(fullPath);
+                }}
               >
                 <span
                   onClick={(e) => {

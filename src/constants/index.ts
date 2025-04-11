@@ -5,3 +5,4 @@ const S3_URL = "https://api.fasttv.dev.yospace.ai/api/s3";
 
 export const FOLDERS_URL = S3_URL + "/folders";
 export const UPLOAD_URL = S3_URL + "/upload";
+export const DELETE_URL = S3_URL + "/delete";
