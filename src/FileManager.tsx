@@ -172,8 +172,8 @@ const FileManager: React.FC = () => {
   const currentPathStr = selectedPath.join("/") || "Root";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 py-10 px-6">
-      <div className="relative max-w-7xl mx-auto border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg bg-white dark:bg-gray-900 p-6">
+    <div className="py-10 px-6">
+      <div className="h-full relative mx-auto border border-gray-200  rounded-2xl shadow-lg bg-white p-6">
         <div className="flex gap-6 m">
           <Sidebar
             setShowCreateFolder={setShowCreateFolder}
@@ -211,7 +211,7 @@ const FileManager: React.FC = () => {
                   </div>
                 )}
                 <Button
-                  className=" text-gray-500 dark:text-gray-400 min-w-[60px]"
+                  className=" text-gray-500  min-w-[60px]"
                   onClick={() => {
                     if (select) {
                       setSelectedFiles([]);
@@ -225,7 +225,7 @@ const FileManager: React.FC = () => {
                   Select
                 </Button>
                 <Button
-                  className="hover:bg-transparent text-gray-500 dark:text-gray-400"
+                  className="hover:bg-transparent text-gray-500 "
                   onClick={() => {
                     setSelectedPath([...selectedPath]);
                   }}
@@ -238,14 +238,14 @@ const FileManager: React.FC = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   value={search}
                   placeholder="Search"
-                  className="w-48 text-sm border border-gray-300 dark:border-gray-600 bg-transparent focus:ring-0 focus:outline-none"
+                  className="w-48 text-sm border border-gray-300  bg-transparent focus:ring-0 focus:outline-none"
                 />
               </div>
             </div>
 
             <CardContent
               className={classNames(
-                "p-4 relative rounded-xl border border-gray-200 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700",
+                "p-4 relative rounded-xl border border-gray-200 bg-white shadow-sm",
                 {
                   "!flex": !searchFilteredItems.length || true,
                   "opacity-50 bg-gray-200": dragActive,
@@ -258,7 +258,7 @@ const FileManager: React.FC = () => {
             >
               {searchFilteredItems.length > 0 ? (
                 <List
-                  height={355}
+                  height={900}
                   itemCount={Math.ceil(
                     searchFilteredItems.length / COLUMN_COUNT
                   )}
@@ -280,7 +280,7 @@ const FileManager: React.FC = () => {
                         {rowItems.map((item) => (
                           <div
                             key={item.id}
-                            className="relative flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                            className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
 
@@ -319,6 +319,7 @@ const FileManager: React.FC = () => {
                                   navigator.clipboard
                                     .writeText(path)
                                     .then(() => {
+                                      (window as any).closeFileManager(path);
                                       setCopiedId(item.id);
                                       setTimeout(() => setCopiedId(null), 1500);
                                     });
@@ -331,7 +332,7 @@ const FileManager: React.FC = () => {
                             ) : (
                               <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
                             )}
-                            <div className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                            <div className="truncate text-sm font-medium text-gray-800">
                               {item.name}
                               {copiedId === item.id && (
                                 <CopiedTooltip index={index} />

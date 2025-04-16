@@ -67,9 +67,9 @@ const Sidebar: React.FC<Props> = ({
             <li key={fullKey}>
               <div
                 className={classNames(
-                  "flex items-center gap-1 cursor-pointer py-1 hover:bg-gray-100 dark:hover:bg-gray-800 px-1 rounded",
+                  "flex items-center gap-1 cursor-pointer py-1 hover:bg-gray-100 px-1 rounded",
                   {
-                    "bg-gray-200 dark:bg-gray-700 text-blue-500 font-medium":
+                    "bg-gray-200 text-blue-500 font-medium":
                       selectedPath.join("/") === fullKey,
                   }
                 )}
@@ -103,12 +103,12 @@ const Sidebar: React.FC<Props> = ({
   };
 
   return (
-    <div className="w-64 border-r border-gray-200 dark:border-gray-700 pr-4 overflow-auto">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 flex gap-2 pt-1 pb-2 px-1 border-b border-gray-200 dark:border-gray-700">
+    <div className="w-64 border-r border-gray-200 pr-4 overflow-auto">
+      <div className="sticky top-0 z-10 bg-white  flex gap-2 pt-1 pb-2 px-1 border-b border-gray-200">
         <Button
           variant="ghost"
           size="sm"
-          className="text-gray-600 dark:text-gray-300 hover:bg-transparent"
+          className="text-gray-600  hover:bg-transparent"
           onClick={() => setShowCreateFolder(true)}
         >
           <Plus className="w-4 h-4 mr-1" /> New
@@ -116,13 +116,13 @@ const Sidebar: React.FC<Props> = ({
         <Button
           variant="ghost"
           size="sm"
-          className="text-gray-600 dark:text-gray-300 hover:bg-transparent"
+          className="text-gray-600  hover:bg-transparent"
           onClick={() => setShowUploadFile(true)}
         >
           <Upload className="w-4 h-4 mr-1" /> Upload
         </Button>
       </div>
-      <div className="overflow-auto max-h-[399px] px-1">{renderTree([])}</div>
+      <div className="overflow-auto max-h-[900px] px-1">{renderTree([])}</div>
     </div>
   );
 };

@@ -17,12 +17,12 @@ const Breadcrumbs: React.FC<Props> = ({ setSelectedPath, selectedPath }) => {
           variant="ghost"
           size="icon"
           onClick={goBack}
-          className="text-gray-500 dark:text-gray-400"
+          className="text-gray-500"
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
       )}
-      <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+      <div className="text-sm text-gray-600 mb-2">
         <span className="text-gray-400">Root</span>
         {selectedPath.map((name, index) => (
           <span key={index}>

@@ -37,8 +37,8 @@ const DeleteConfirm: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 text-center mb-6">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
+        <h2 className="text-lg font-semibold text-gray-800 text-center mb-6">
           Do you want to Delete Files: | {selectedFiles.length}
         </h2>
 
