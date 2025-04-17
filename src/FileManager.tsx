@@ -342,8 +342,12 @@ const FileManager: React.FC = () => {
                                   navigator.clipboard
                                     .writeText(path)
                                     .then(() => {
-                                      if (isInFileManagerPage) {
+                                      if (!isInFileManagerPage) {
                                         (window as any).closeFileManager(path);
+                                      } else {
+                                        if ((window as any).takeCopyText) {
+                                          (window as any)?.takeCopyText(path);
+                                        }
                                       }
                                       setCopiedId(item.id);
                                       setTimeout(() => setCopiedId(null), 1500);
