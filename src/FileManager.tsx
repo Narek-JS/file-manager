@@ -1,6 +1,6 @@
 import { deleteFiles, getFolders, uploadFiles } from "./utils/requestHandlers";
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
-import { RefreshCw, FileText, Folder, Trash2 } from "lucide-react";
+import { RefreshCw, FileText, Folder, Trash2, X } from "lucide-react";
 import { DeleteConfirm } from "./components/Modals/DeletConfirm";
 import { CopiedTooltip } from "./components/ui/CopiedTooltip";
 import { CardContent, Button, Input } from "./components/ui";
@@ -171,9 +171,32 @@ const FileManager: React.FC = () => {
 
   const currentPathStr = selectedPath.join("/") || "Root";
 
+  const isInFileManagerPage = (window as any)?.location?.pathname?.includes(
+    "elfinder-react"
+  );
+
   return (
     <div className="py-10 px-6">
-      <div className="h-full relative mx-auto border border-gray-200  rounded-2xl shadow-lg bg-white p-6">
+      <div
+        className={classNames(
+          "h-full relative mx-auto border border-gray-200 bg-white p-6",
+          {
+            "max-w-[1200px] rounded-2xl shadow-lg": !isInFileManagerPage,
+            "max-w-full": isInFileManagerPage,
+          }
+        )}
+      >
+        {!isInFileManagerPage && (
+          <div
+            className="closeIcon absolute right-1 top-[0.5px] cursor-pointer"
+            onClick={() => {
+              (window as any).closeFileManager();
+            }}
+          >
+            <X />
+          </div>
+        )}
+
         <div className="flex gap-6 m">
           <Sidebar
             setShowCreateFolder={setShowCreateFolder}
@@ -258,7 +281,7 @@ const FileManager: React.FC = () => {
             >
               {searchFilteredItems.length > 0 ? (
                 <List
-                  height={900}
+                  height={600}
                   itemCount={Math.ceil(
                     searchFilteredItems.length / COLUMN_COUNT
                   )}
@@ -319,7 +342,9 @@ const FileManager: React.FC = () => {
                                   navigator.clipboard
                                     .writeText(path)
                                     .then(() => {
-                                      (window as any).closeFileManager(path);
+                                      if (isInFileManagerPage) {
+                                        (window as any).closeFileManager(path);
+                                      }
                                       setCopiedId(item.id);
                                       setTimeout(() => setCopiedId(null), 1500);
                                     });

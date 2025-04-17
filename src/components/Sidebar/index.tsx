@@ -122,7 +122,7 @@ const Sidebar: React.FC<Props> = ({
           <Upload className="w-4 h-4 mr-1" /> Upload
         </Button>
       </div>
-      <div className="overflow-auto max-h-[900px] px-1">{renderTree([])}</div>
+      <div className="overflow-auto max-h-[640px] px-1">{renderTree([])}</div>
     </div>
   );
 };
