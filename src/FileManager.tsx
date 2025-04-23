@@ -67,6 +67,7 @@ const FileManager: React.FC = () => {
   useEffect(() => {
     const currentPath = selectedPath.join("/");
     setItems([]);
+    setSearch("");
 
     const loadFolderContent = async () => {
       setIsLoading(true);
@@ -164,6 +165,72 @@ const FileManager: React.FC = () => {
     handleUpload(e.dataTransfer.files);
   };
 
+  const isInFileManagerPage = (): boolean => {
+    return (window as any)?.location?.pathname?.includes("elfinder-react");
+  };
+
+  const moveInFolder = (folderName: string) => {
+    setSelectedPath((prev) => [...prev, folderName]);
+    setSelectedFiles([]);
+    setSelect(false);
+  };
+
+  const selectFileToogle = (fileName: string) => {
+    const isSelected = !!selectedFiles.find(
+      (selectedFileName) => fileName === selectedFileName
+    );
+    if (!isSelected) {
+      setSelectedFiles([...selectedFiles, fileName]);
+    } else {
+      setSelectedFiles(
+        selectedFiles.filter((fileName) => fileName !== fileName)
+      );
+    }
+  };
+
+  const copyFileName = ({
+    fileName,
+    fileId,
+  }: {
+    fileName: string;
+    fileId: number;
+  }) => {
+    const path =
+      "images/" +
+      (selectedPath.length
+        ? selectedPath.join("/") + "/" + fileName
+        : fileName);
+
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+
+    navigator.clipboard.writeText(path).then(() => {
+      if (!isInFileManagerPage()) {
+        (window as any)?.closeFileManager(path);
+      } else {
+        if ((window as any).takeCopyText) {
+          (window as any)?.takeCopyText(path);
+        }
+      }
+
+      setCopiedId(fileId);
+      setTimeout(() => setCopiedId(null), 1500);
+    });
+  };
+
+  const handleClickOnItem = (item: Item) => {
+    if (item.type === "folder") {
+      return moveInFolder(item.name);
+    }
+
+    if (select) {
+      return selectFileToogle(item.name);
+    }
+
+    return copyFileName({ fileId: item.id, fileName: item.name });
+  };
+
   const searchFilteredItems = useMemo(
     () => items.filter(({ name }) => name.includes(search) || search === ""),
     [items, search]
@@ -171,22 +238,18 @@ const FileManager: React.FC = () => {
 
   const currentPathStr = selectedPath.join("/") || "Root";
 
-  const isInFileManagerPage = (window as any)?.location?.pathname?.includes(
-    "elfinder-react"
-  );
-
   return (
     <div className="py-10 px-6">
       <div
         className={classNames(
           "h-full relative mx-auto border border-gray-200 bg-white p-6",
           {
-            "max-w-[1200px] rounded-2xl shadow-lg": !isInFileManagerPage,
-            "max-w-full": isInFileManagerPage,
+            "max-w-[1200px] rounded-2xl shadow-lg": !isInFileManagerPage(),
+            "max-w-full": isInFileManagerPage(),
           }
         )}
       >
-        {!isInFileManagerPage && (
+        {!isInFileManagerPage() && (
           <div
             className="closeIcon absolute right-1 top-[0.5px] cursor-pointer"
             onClick={() => {
@@ -306,54 +369,7 @@ const FileManager: React.FC = () => {
                             className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
-
-                              if (item.type === "folder") {
-                                setSelectedPath((prev) => [...prev, item.name]);
-                                setSelectedFiles([]);
-                                setSelect(false);
-                              } else {
-                                if (select) {
-                                  const isSelected = !!selectedFiles.find(
-                                    (fileName) => item.name === fileName
-                                  );
-                                  if (!isSelected) {
-                                    setSelectedFiles([
-                                      ...selectedFiles,
-                                      item.name,
-                                    ]);
-                                  } else {
-                                    setSelectedFiles(
-                                      selectedFiles.filter(
-                                        (fileName) => fileName !== item.name
-                                      )
-                                    );
-                                  }
-                                } else {
-                                  const path =
-                                    "images/" +
-                                    (selectedPath.length
-                                      ? selectedPath.join("/") + "/" + item.name
-                                      : item.name);
-
-                                  if (timeoutId.current) {
-                                    clearTimeout(timeoutId.current);
-                                  }
-
-                                  navigator.clipboard
-                                    .writeText(path)
-                                    .then(() => {
-                                      if (!isInFileManagerPage) {
-                                        (window as any).closeFileManager(path);
-                                      } else {
-                                        if ((window as any).takeCopyText) {
-                                          (window as any)?.takeCopyText(path);
-                                        }
-                                      }
-                                      setCopiedId(item.id);
-                                      setTimeout(() => setCopiedId(null), 1500);
-                                    });
-                                }
-                              }
+                              handleClickOnItem(item);
                             }}
                           >
                             {item.type === "folder" ? (
