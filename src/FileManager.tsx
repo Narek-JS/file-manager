@@ -204,13 +204,13 @@ const FileManager: React.FC = () => {
     }
 
     navigator.clipboard.writeText(path).then(() => {
-      // if (!isInFileManagerPage()) {
-      //   (window as any)?.closeFileManager(path);
-      // } else {
-      //   if ((window as any).takeCopyText) {
-      //     (window as any)?.takeCopyText(path);
-      //   }
-      // }
+      if (!isInFileManagerPage()) {
+        (window as any)?.closeFileManager(path);
+      } else {
+        if ((window as any).takeCopyText) {
+          (window as any)?.takeCopyText(path);
+        }
+      }
 
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 1500);
