@@ -1,7 +1,9 @@
-import { deleteFiles, getFolders, uploadFiles } from "./utils/requestHandlers";
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
 import { RefreshCw, FileText, Folder, Trash2, X } from "lucide-react";
+import { FilePreviewWrapper } from "./components/FilePreviewWrapper";
+import { getFolders, uploadFiles } from "./utils/requestHandlers";
 import { DeleteConfirm } from "./components/Modals/DeletConfirm";
+import { PreviewImage } from "./components/Modals/PreviewImage";
 import { CopiedTooltip } from "./components/ui/CopiedTooltip";
 import { CardContent, Button, Input } from "./components/ui";
 import { useState, useEffect, useMemo, useRef } from "react";
@@ -33,10 +35,12 @@ const FileManager: React.FC = () => {
   const [expandedPaths, setExpandedPaths] = useState<ExpandedPathsT>({});
   const [selectedFiles, setSelectedFiles] = useState<Array<string>>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [selectedPath, setSelectedPath] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [showUploadFile, setShowUploadFile] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState<string>("");
@@ -188,13 +192,7 @@ const FileManager: React.FC = () => {
     }
   };
 
-  const copyFileName = ({
-    fileName,
-    fileId,
-  }: {
-    fileName: string;
-    fileId: number;
-  }) => {
+  const copyFileName = ({ fileName, id }: { fileName: string; id: number }) => {
     const path =
       "images/" +
       (selectedPath.length
@@ -206,15 +204,15 @@ const FileManager: React.FC = () => {
     }
 
     navigator.clipboard.writeText(path).then(() => {
-      if (!isInFileManagerPage()) {
-        (window as any)?.closeFileManager(path);
-      } else {
-        if ((window as any).takeCopyText) {
-          (window as any)?.takeCopyText(path);
-        }
-      }
+      // if (!isInFileManagerPage()) {
+      //   (window as any)?.closeFileManager(path);
+      // } else {
+      //   if ((window as any).takeCopyText) {
+      //     (window as any)?.takeCopyText(path);
+      //   }
+      // }
 
-      setCopiedId(fileId);
+      setCopiedId(id);
       setTimeout(() => setCopiedId(null), 1500);
     });
   };
@@ -228,7 +226,7 @@ const FileManager: React.FC = () => {
       return selectFileToogle(item.name);
     }
 
-    return copyFileName({ fileId: item.id, fileName: item.name });
+    return copyFileName({ id: item.id, fileName: item.name });
   };
 
   const searchFilteredItems = useMemo(
@@ -364,38 +362,45 @@ const FileManager: React.FC = () => {
                         className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 !pb-[200px]"
                       >
                         {rowItems.map((item) => (
-                          <div
-                            key={item.id}
-                            className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleClickOnItem(item);
+                          <FilePreviewWrapper
+                            item={item}
+                            onClick={handleClickOnItem}
+                            onShowPreview={() => {
+                              const imageUrl = `https://images.fasttv.prod.yospace.ai/images/1_FastTV/Slider_Ads/23.04_celta_villareal.webp`; // `/images/${item.name}`;
+
+                              setShowPreview(true);
+                              setPreviewImageUrl(imageUrl);
                             }}
                           >
-                            {item.type === "folder" ? (
-                              <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
-                            ) : (
-                              <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
-                            )}
-                            <div className="truncate text-sm font-medium text-gray-800">
-                              {item.name}
-                              {copiedId === item.id && (
-                                <CopiedTooltip index={index} />
+                            <div
+                              key={item.id}
+                              className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer"
+                            >
+                              {item.type === "folder" ? (
+                                <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
+                              ) : (
+                                <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
                               )}
-                              {item.type === "file" && select && (
-                                <Input
-                                  checked={
-                                    !!selectedFiles.find(
-                                      (fileName) => item.name === fileName
-                                    )
-                                  }
-                                  onChange={() => {}}
-                                  type="radio"
-                                  className="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                                />
-                              )}
+                              <div className="truncate text-sm font-medium text-gray-800">
+                                {item.name}
+                                {copiedId === item.id && (
+                                  <CopiedTooltip index={index} />
+                                )}
+                                {item.type === "file" && select && (
+                                  <Input
+                                    checked={
+                                      !!selectedFiles.find(
+                                        (fileName) => item.name === fileName
+                                      )
+                                    }
+                                    onChange={() => {}}
+                                    type="radio"
+                                    className="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                  />
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          </FilePreviewWrapper>
                         ))}
                       </div>
                     );
@@ -438,6 +443,16 @@ const FileManager: React.FC = () => {
             setShowDeleteConfirm(false);
             setSelectedFiles([]);
             setSelect(false);
+          }}
+        />
+      )}
+
+      {showPreview && (
+        <PreviewImage
+          src={previewImageUrl}
+          onClose={() => {
+            setShowPreview(false);
+            setPreviewImageUrl("");
           }}
         />
       )}
