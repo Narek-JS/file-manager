@@ -1,3 +1,5 @@
+export const IMAGE_URL = "https://fasttv.am/images";
+
 export const S3_API_KEY =
   "vLFJj11KHqz1fzbpRCvhGpU2T8yOYBZX6gY9bvVNcAKmbzPv5C3RTLvtHrqceCWs";
 

@@ -12,6 +12,7 @@ import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
 import { FixedSizeList as List } from "react-window";
 import { Sidebar } from "./components/Sidebar";
+import { IMAGE_URL } from "./constants";
 import classNames from "classnames";
 import React from "react";
 
@@ -363,19 +364,17 @@ const FileManager: React.FC = () => {
                       >
                         {rowItems.map((item) => (
                           <FilePreviewWrapper
+                            key={item.id}
                             item={item}
                             onClick={handleClickOnItem}
                             onShowPreview={() => {
-                              const imageUrl = `https://images.fasttv.prod.yospace.ai/images/1_FastTV/Slider_Ads/23.04_celta_villareal.webp`; // `/images/${item.name}`;
+                              const imageUrl = IMAGE_URL + `/${item.name}`;
 
                               setShowPreview(true);
                               setPreviewImageUrl(imageUrl);
                             }}
                           >
-                            <div
-                              key={item.id}
-                              className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer"
-                            >
+                            <div className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer">
                               {item.type === "folder" ? (
                                 <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
                               ) : (
