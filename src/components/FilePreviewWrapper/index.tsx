@@ -21,7 +21,7 @@ const FilePreviewWrapper: React.FC<FilePreviewWrapperProps> = ({
 
   return (
     <div
-      className="relative group"
+      className="relative group w-[193px]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

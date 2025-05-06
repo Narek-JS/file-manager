@@ -16,7 +16,7 @@ import { IMAGE_URL } from "./constants";
 import classNames from "classnames";
 import React from "react";
 
-const ROW_HEIGHT = 40;
+const ROW_HEIGHT = 70;
 const COLUMN_COUNT = 4;
 
 interface Item {
@@ -350,7 +350,7 @@ const FileManager: React.FC = () => {
                   itemCount={Math.ceil(
                     searchFilteredItems.length / COLUMN_COUNT
                   )}
-                  itemSize={ROW_HEIGHT + 16}
+                  itemSize={ROW_HEIGHT}
                   width="100%"
                 >
                   {({ index, style }) => {
@@ -363,7 +363,7 @@ const FileManager: React.FC = () => {
                     return (
                       <div
                         style={style}
-                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 !pb-[200px]"
+                        className="mb-[20px] flex flex-wrap gap-4"
                       >
                         {rowItems.map((item) => {
                           const imageUrl = IMAGE_URL + `/${item.name}`;
@@ -388,7 +388,7 @@ const FileManager: React.FC = () => {
                                   {item.type === "file" ? (
                                     <Fragment>
                                       {imageErrorPaths[imageUrl] ? (
-                                        item.name
+                                        "Image not Found"
                                       ) : (
                                         <img
                                           onError={() => {
@@ -423,6 +423,11 @@ const FileManager: React.FC = () => {
                                   )}
                                 </div>
                               </div>
+                              {item.type === "file" && (
+                                <p className="text-nowrap truncate text-sm font-medium text-gray-800">
+                                  {item.name}
+                                </p>
+                              )}
                             </FilePreviewWrapper>
                           );
                         })}
