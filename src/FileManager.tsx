@@ -425,7 +425,19 @@ const FileManager: React.FC = () => {
                               </div>
                               {item.type === "file" && (
                                 <p className="text-nowrap truncate text-sm font-medium text-gray-800">
-                                  {item.name}
+                                  {(() => {
+                                    const maxBaseLength = 16;
+                                    const parts = item.name.split(".");
+                                    const ext = parts.pop();
+                                    const base = parts.join(".");
+
+                                    const displayName =
+                                      base.length > maxBaseLength
+                                        ? base.slice(0, maxBaseLength) + "..."
+                                        : base;
+
+                                    return `${displayName}.${ext}`;
+                                  })()}
                                 </p>
                               )}
                             </FilePreviewWrapper>
