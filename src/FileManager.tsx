@@ -1,4 +1,5 @@
 import { CreateFolderModal, UploadFileModal } from "./components/Modals";
+import { useState, useEffect, useMemo, useRef, Fragment } from "react";
 import { RefreshCw, FileText, Folder, Trash2, X } from "lucide-react";
 import { FilePreviewWrapper } from "./components/FilePreviewWrapper";
 import { getFolders, uploadFiles } from "./utils/requestHandlers";
@@ -6,7 +7,6 @@ import { DeleteConfirm } from "./components/Modals/DeletConfirm";
 import { PreviewImage } from "./components/Modals/PreviewImage";
 import { CopiedTooltip } from "./components/ui/CopiedTooltip";
 import { CardContent, Button, Input } from "./components/ui";
-import { useState, useEffect, useMemo, useRef } from "react";
 import { ScreenLoading } from "./components/ScreenLoading";
 import { Breadcrumbs } from "./components/Breadcrumbs";
 import { EmptyScreen } from "./components/EmptyScreen";
@@ -32,6 +32,9 @@ export type FetchedChildT = Record<
 export type ExpandedPathsT = Record<string, boolean>;
 
 const FileManager: React.FC = () => {
+  const [imageErrorPaths, setImageErrorPaths] = useState<
+    Record<string, boolean>
+  >({});
   const [fetchedChildren, setFetchedChildren] = useState<FetchedChildT>({});
   const [expandedPaths, setExpandedPaths] = useState<ExpandedPathsT>({});
   const [selectedFiles, setSelectedFiles] = useState<Array<string>>([]);
@@ -206,10 +209,10 @@ const FileManager: React.FC = () => {
 
     navigator.clipboard.writeText(path).then(() => {
       if (!isInFileManagerPage()) {
-        (window as any)?.closeFileManager(path);
+        (window as any)?.closeFileManager?.(path);
       } else {
         if ((window as any).takeCopyText) {
-          (window as any)?.takeCopyText(path);
+          (window as any)?.takeCopyText?.(path);
         }
       }
 
@@ -362,45 +365,67 @@ const FileManager: React.FC = () => {
                         style={style}
                         className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 !pb-[200px]"
                       >
-                        {rowItems.map((item) => (
-                          <FilePreviewWrapper
-                            key={item.id}
-                            item={item}
-                            onClick={handleClickOnItem}
-                            onShowPreview={() => {
-                              const imageUrl = IMAGE_URL + `/${item.name}`;
+                        {rowItems.map((item) => {
+                          const imageUrl = IMAGE_URL + `/${item.name}`;
 
-                              setShowPreview(true);
-                              setPreviewImageUrl(imageUrl);
-                            }}
-                          >
-                            <div className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer">
-                              {item.type === "folder" ? (
-                                <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
-                              ) : (
-                                <FileText className="min-w-5 min-h-5 w-5 h-5 text-gray-400" />
-                              )}
-                              <div className="truncate text-sm font-medium text-gray-800">
-                                {item.name}
-                                {copiedId === item.id && (
-                                  <CopiedTooltip index={index} />
+                          return (
+                            <FilePreviewWrapper
+                              key={item.id}
+                              item={item}
+                              onClick={handleClickOnItem}
+                              onShowPreview={() => {
+                                setShowPreview(true);
+                                setPreviewImageUrl(imageUrl);
+                              }}
+                            >
+                              <div className="relative flex items-center gap-2 p-3 bg-white rounded-lg border border-gray-100  hover:bg-gray-50 cursor-pointer">
+                                {item.type === "folder" ? (
+                                  <Folder className="min-w-5 min-h-5 w-5 h-5 text-yellow-500" />
+                                ) : (
+                                  <FileText className="z-10 min-w-5 min-h-5 w-5 h-5 text-gray-400" />
                                 )}
-                                {item.type === "file" && select && (
-                                  <Input
-                                    checked={
-                                      !!selectedFiles.find(
-                                        (fileName) => item.name === fileName
-                                      )
-                                    }
-                                    onChange={() => {}}
-                                    type="radio"
-                                    className="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                                  />
-                                )}
+                                <div className="truncate text-sm font-medium text-gray-800">
+                                  {item.type === "file" ? (
+                                    <Fragment>
+                                      {imageErrorPaths[imageUrl] ? (
+                                        item.name
+                                      ) : (
+                                        <img
+                                          onError={() => {
+                                            setImageErrorPaths({
+                                              ...imageErrorPaths,
+                                              [imageUrl]: true,
+                                            });
+                                          }}
+                                          src={imageUrl}
+                                          className="absolute object-cover rounded-lg left-0 top-0 h-[46px] w-[190px]"
+                                        />
+                                      )}
+                                    </Fragment>
+                                  ) : (
+                                    item.name
+                                  )}
+
+                                  {copiedId === item.id && (
+                                    <CopiedTooltip index={index} />
+                                  )}
+                                  {item.type === "file" && select && (
+                                    <Input
+                                      checked={
+                                        !!selectedFiles.find(
+                                          (fileName) => item.name === fileName
+                                        )
+                                      }
+                                      onChange={() => {}}
+                                      type="radio"
+                                      className="absolute right-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                    />
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </FilePreviewWrapper>
-                        ))}
+                            </FilePreviewWrapper>
+                          );
+                        })}
                       </div>
                     );
                   }}
