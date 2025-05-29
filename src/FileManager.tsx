@@ -366,7 +366,10 @@ const FileManager: React.FC = () => {
                         className="mb-[20px] flex flex-wrap gap-4"
                       >
                         {rowItems.map((item) => {
-                          const imageUrl = IMAGE_URL + `/${item.name}`;
+                          const imageUrl =
+                            IMAGE_URL +
+                            "/" +
+                            [...selectedPath, item.name].join("/");
 
                           return (
                             <FilePreviewWrapper
