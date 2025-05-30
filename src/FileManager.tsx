@@ -198,7 +198,7 @@ const FileManager: React.FC = () => {
 
   const copyFileName = ({ fileName, id }: { fileName: string; id: number }) => {
     const path =
-      "images/" +
+      "uploads/" +
       (selectedPath.length
         ? selectedPath.join("/") + "/" + fileName
         : fileName);
